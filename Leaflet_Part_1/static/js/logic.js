@@ -21,13 +21,28 @@ d3.json(geoData).then(function (data) {
     console.log(data);
 });
 
+//function to determine marker size by magnitude
+function markerSize(magnitude) {
+    return magnitude * 25000;
+};
+
+//function to change color of marker by depth
+function markerColor(depth) {
+    if (depth < 10) return "#02F76C";
+    else if (depth < 30) return "#01BC52";
+    else if (depth < 50) return "#01843A";
+    else if (depth < 70) return "#00632B";
+    else if (depth < 90) return "#003818";
+    else return "#000703";
+
+};
+
 function createFeatures(earthquakeData) {
 
     //This function runs for each feature in array. This features gives a marker and popup.
     function onEachFeature(feature, layer) {
         layer.bindPopup(`<h3>Location: ${feature.properties.place}</h3><hr><p>Magnitude: ${feature.properties.mag}</p><p>Depth: ${feature.geometry.coordinates[2]}</p>`);
     }
-
 
 //Creat geoJSON layer that contains features array on the earthquakeFeatures object
 //Run the onEachFeature function once for each piece of data in the array
@@ -52,24 +67,8 @@ let earthquakes = L.geoJSON(earthquakeData, {
 
 
 
-//function to determine marker size by magnitude
-function markerSize(magnitude) {
-    return magnitude * 25000;
-};
-
-//function to change color of marker by depth
-function markerColor(depth) {
-    if (depth < 10) return "#02F76C";
-    else if (depth < 30) return "#01BC52";
-    else if (depth < 50) return "#01843A";
-    else if (depth < 70) return "#00632B";
-    else if (depth < 90) return "#003818";
-    else return "#000703";
-
-}
-
-//Send the earthquakes layer to the createMap function
-createMap(earthquakes);
+    //Send the earthquakes layer to the createMap function
+    createMap(earthquakes);
 }
 
 function createMap(earthquakes) {
@@ -98,19 +97,19 @@ function createMap(earthquakes) {
     let legend = L.control({position: "bottomright"});
     
     legend.onAdd = function() {
-        let div = L.DomUtil.create("div", "info legend"),
+         let div = L.DomUtil.create("div", "info legend"),
         depth = [-10, 10, 30, 50, 70, 90];
     
         div.innerHTML += "<h3 style='text-align: center'>Depth</h3>"
     
         for (var i=0; i < depth.length; i++) {
-             div.innerHTML +=
-            '<i style="background:' + markerColor(depth[i] + 1) + '"></i> ' + depth[i] + (depth[i + 1] ? '&ndash;' + depth[i+1] + '<br>' : '+');
+            div.innerHTML +=
+            '<i style="background:' + markerColor(depth[i] + 1) + '"></i> ' + depth[i] + (depth[i + 1] ? '&ndash;' + depth[i + 1] + '<br>' : '+');
         }
-    
         return div;
     };
-    
+    legend.addTo(myMap);
+
     // Create a layer control.
     // Pass it our baseMaps and overlayMaps.
     // Add the layer control to the map.
@@ -118,7 +117,5 @@ function createMap(earthquakes) {
       collapsed: false
     }).addTo(myMap);
 
-
-  
-  }
+};
   
